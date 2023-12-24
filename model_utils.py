@@ -2,6 +2,7 @@ import torch
 from torch import nn, optim
 from torchvision import models
 from collections import OrderedDict
+import os
 
 def build_model(arch='vgg16', hidden_units=512):
     if arch == 'vgg16':
@@ -85,7 +86,7 @@ def save_checkpoint(model, arch, hidden_units, learning_rate, epochs, save_dir='
         'learning_rate': learning_rate,
         'epochs': epochs,
         'state_dict': model.state_dict(),
-        'class_to_idx': model.class_to_idx
+        # 'class_to_idx': model.class_to_idx
     }
 
     if not os.path.exists(save_dir):
