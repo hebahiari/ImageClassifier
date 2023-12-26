@@ -19,5 +19,5 @@ def get_predict_args():
     parser.add_argument("image_path", type=str, help="Path to the input image")
     parser.add_argument("checkpoint_path", type=str, help="Path to the trained model checkpoint")
     parser.add_argument("--topk", type=int, default=5, help="Return top K most likely classes")
-
+    parser.add_argument("--gpu", action="store_true", help="Use GPU for training")
     return parser.parse_args()

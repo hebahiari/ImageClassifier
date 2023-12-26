@@ -79,14 +79,14 @@ def validate_model(model, valid_loader, criterion, device):
     print(f"Validation Loss: {validation_loss / len(valid_loader):.3f}.. "
           f"Validation Accuracy: {accuracy / len(valid_loader):.3f}")
 
-def save_checkpoint(model, arch, hidden_units, learning_rate, epochs, save_dir='checkpoints'):
+def save_checkpoint(model, arch, hidden_units, learning_rate, epochs, class_to_idx, save_dir='checkpoints'):
     checkpoint = {
         'arch': arch,
         'hidden_units': hidden_units,
         'learning_rate': learning_rate,
         'epochs': epochs,
         'state_dict': model.state_dict(),
-        # 'class_to_idx': model.class_to_idx
+        'class_to_idx': class_to_idx
     }
 
     if not os.path.exists(save_dir):
@@ -95,11 +95,12 @@ def save_checkpoint(model, arch, hidden_units, learning_rate, epochs, save_dir='
     torch.save(checkpoint, f'{save_dir}/checkpoint.pth')
 
 def load_checkpoint(filepath):
-    checkpoint = torch.load(filepath)
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    checkpoint = torch.load(filepath, map_location=device)
 
     model = build_model(checkpoint['arch'], checkpoint['hidden_units'])
     model.load_state_dict(checkpoint['state_dict'])
-    model.class_to_idx = checkpoint['class_to_idx']
+    # model.class_to_idx = checkpoint['class_to_idx']
 
     return model
 

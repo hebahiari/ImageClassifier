@@ -6,16 +6,16 @@ def main():
     args = get_predict_args()
 
     # Load the model checkpoint
-    model = load_checkpoint(args.checkpoint)
+    model = load_checkpoint(args.checkpoint_path)
 
     # Preprocess the input image
     image = process_image(args.image_path)
 
     # Predict the class
-    probs, classes = predict(image, model, args.top_k, args.gpu)
+    probs, classes = predict(image, model, args.topk, args.gpu)
 
     # Display the results
-    print(f"Top {args.top_k} Classes:")
+    print(f"Top {args.topk} Classes:")
     for prob, cls in zip(probs, classes):
         print(f"Class: {cls}, Probability: {prob}")
 
