@@ -100,11 +100,27 @@ def load_checkpoint(filepath):
 
     model = build_model(checkpoint['arch'], checkpoint['hidden_units'])
     model.load_state_dict(checkpoint['state_dict'])
-    # model.class_to_idx = checkpoint['class_to_idx']
+    model.class_to_idx = checkpoint['class_to_idx']
 
     return model
 
-def predict(image, model, topk=1, use_gpu=False):
+# def predict(image, model, topk=1, use_gpu=False):
+#     device = torch.device('cuda' if use_gpu and torch.cuda.is_available() else 'cpu')
+#     model.to(device)
+
+#     image = image.to(device)
+#     image = image.unsqueeze(0)
+
+#     with torch.no_grad():
+#         model.eval()
+#         output = model(image)
+
+#     probs, classes = torch.topk(torch.exp(output), topk)
+#     probs, classes = probs.cpu().numpy()[0], classes.cpu().numpy()[0]
+
+#     return probs, classes
+
+def predict(image, model, topk=5, use_gpu=False):
     device = torch.device('cuda' if use_gpu and torch.cuda.is_available() else 'cpu')
     model.to(device)
 
@@ -114,8 +130,15 @@ def predict(image, model, topk=1, use_gpu=False):
     with torch.no_grad():
         model.eval()
         output = model(image)
-
-    probs, classes = torch.topk(torch.exp(output), topk)
-    probs, classes = probs.cpu().numpy()[0], classes.cpu().numpy()[0]
-
-    return probs, classes
+    
+    # Calculate the probabilities and indices of the topk predictions
+    probabilities, indices = torch.topk(torch.nn.functional.softmax(output[0], dim=0), topk)
+    
+    # Convert indices to class labels
+    idx_to_class = {v: k for k, v in model.class_to_idx.items()}
+    classes = [idx_to_class[idx.item()] for idx in indices]
+    
+    # Convert tensor to NumPy array for easier manipulation
+    probabilities = probabilities.numpy()
+    
+    return probabilities, classes
